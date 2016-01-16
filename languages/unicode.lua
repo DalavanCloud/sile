@@ -49,12 +49,12 @@ SILE.nodeMakers.unicode = SILE.nodeMakers.base {
     local ics = SILE.settings.get("document.letterspaceglue")
     return coroutine.wrap(function()
       for i = 1,#items do item = items[i]
-        local char = items[i].text
+        local char = item.text
         local cp = SU.codepoint(char)
         local thistype = chardata[cp] and chardata[cp].linebreak
         if chardata[cp] and thistype == "sp" then
           self:makeToken()
-          self:makeGlue()
+          self:makeGlue(item.width)
         elseif chardata[cp] and (thistype == "ba" or  thistype == "zw") then
           self:addToken(char,item)
           self:makeToken()
@@ -114,7 +114,7 @@ if icu then
               if chardata[cp] and thistype == "sp" then
                 -- Spacing word break
                 self:makeToken()
-                self:makeGlue()
+                self:makeGlue(item.width)
               else -- a word break which isn't a space
                 self:makeToken()
                 self:addToken(char,item)

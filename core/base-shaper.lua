@@ -18,7 +18,7 @@ SILE.shapers.base = std.object {
   -- giving preference to document.spaceskip
 
   -- Caching this has no significant speedup
-  measureSpace = function(self, options)
+  measureSpace = function(self, options, advance)
     local ss = SILE.settings.get("document.spaceskip")
     if ss then
       SILE.settings.temporarily(function()
@@ -29,16 +29,26 @@ SILE.shapers.base = std.object {
       return ss
     end
     local i,w = self:shapeToken(" ", options)
-    local spacewidth
+    local spacewidth, shrink, stretch, length
     if w then spacewidth = w.length
     else
       if not i[1] then return SILE.length.new() end
       spacewidth = i[1].width
     end
+    if ss then
+        shrink = ss.shrink
+        stretch = ss.stretch
+        if advance != nil then length = ss.length + advance - spacewidth * 1.2
+        else length = ss.length
+    else
+        shrink = spacewidth / 3
+        stretch = spacewidth / 2
+        length = advance or spacewidth * 1.2
+    end
     return SILE.length.new({
-      length = spacewidth * 1.2,
-      shrink = spacewidth/3,
-      stretch = spacewidth /2
+      length = length,
+      shrink = shrink,
+      stretch = stretch
     }) -- XXX all rather arbitrary
   end,
 
@@ -82,6 +92,7 @@ SILE.shapers.base = std.object {
     local nodes = {}
     for node in (nodeMaker { options=options }):iterator(items, token) do
       nodes[#nodes+1] = node
+      --SU.debug("glyphs", "Glyph Node "..node)
     end
     return nodes
   end,
@@ -123,7 +134,7 @@ SILE.shapers.base = std.object {
     })
   end,
 
-  makeSpaceNode = function(self, options)
-    return SILE.nodefactory.newGlue({ width = SILE.shaper:measureSpace(options) })
+  makeSpaceNode = function(self, options, advance)
+    return SILE.nodefactory.newGlue({ width = SILE.shaper:measureSpace(options, advance) })
   end
 }

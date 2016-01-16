@@ -45,6 +45,7 @@ SILE.shapers.harfbuzz = SILE.shapers.base {
     for i = 1,#items do
       local e = (i == #items) and #text or items[i+1].index
       items[i].text = text:sub(items[i].index+1, e) -- Lua strings are 1-indexed
+      --SU.debug("glyphs", "Glyph item("..options..") "..items[i])
     end
     if #text < smallTokenSize then shapeCache[_key(options,text)] = items end
     return items
