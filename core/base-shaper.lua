@@ -38,8 +38,8 @@ SILE.shapers.base = std.object {
     if ss then
         shrink = ss.shrink
         stretch = ss.stretch
-        if advance != nil then length = ss.length + advance - spacewidth * 1.2
-        else length = ss.length
+        if advance ~= nil then length = ss.length + advance - spacewidth * 1.2
+        else length = ss.length end
     else
         shrink = spacewidth / 3
         stretch = spacewidth / 2
